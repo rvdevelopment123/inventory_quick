@@ -6,6 +6,8 @@ const { ItemService, ItemsController } = require('./items');
 const CategoryController = require('./categories');
 const LocationController = require('./locations');
 const ItemTypeController = require('./item_types');
+const { Security } = require('../auth/core');
+
 // Inventory service is currently using mock data and needs refactoring to use DB
 // const { InventoryController } = require('./inventory'); 
 
@@ -15,7 +17,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || '*', // Allow Vercel frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Localization Middleware (Basic)
@@ -36,6 +42,42 @@ app.get('/health', async (req, res) => {
   } catch (err) {
     res.status(500).json({ status: 'unhealthy', database: 'disconnected', error: err.message });
   }
+});
+
+// Auth Routes
+app.post('/api/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username/Email and password are required' });
+        }
+
+        const { rows } = await db.query('SELECT * FROM users WHERE username = ? OR email = ?', [username, username]);
+        const user = rows[0];
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const isValid = await Security.verifyPassword(password, user.hashed_password);
+        if (!isValid) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const token = Security.generateToken(
+            { id: user.id, username: user.username, role: user.role }, 
+            process.env.JWT_SECRET || 'secret', 
+            86400 // 24 hours
+        );
+
+        res.json({
+            token,
+            user: { id: user.id, username: user.username, role: user.role }
+        });
+    } catch (err) {
+        console.error('Login Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Routes
