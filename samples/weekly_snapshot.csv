@@ -1,0 +1,4 @@
+item_name,sku,location,quantity,unit,value
+"Flour - All Purpose",ING-001,"Main Warehouse",150,bag,1500.00
+"Sugar - Granulated",ING-002,"Secondary Storage",20,bag,200.00
+"Olive Oil, Extra Virgin",ING-003,"Kitchen",5,liter,125.50

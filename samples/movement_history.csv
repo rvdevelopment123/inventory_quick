@@ -1,0 +1,4 @@
+Date,Movement Type,Item Name,Quantity,From Location,To Location,Reference Number
+2023-10-25 10:00,receipt,Flour,100,,Main Warehouse,PO-1001
+2023-10-26 14:00,transfer,Flour,20,Main Warehouse,Secondary Storage,TR-500
+2023-10-27 09:30,consumption,Sugar,5,Main Warehouse,,PROD-BATCH-1

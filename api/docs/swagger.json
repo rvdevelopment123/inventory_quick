@@ -1,0 +1,99 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Inventory Quick API",
+    "version": "1.0.0",
+    "description": "API for Inventory Management System"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "parent_id": { "type": "integer", "nullable": true },
+          "status": { "type": "string", "enum": ["active", "archived"] }
+        },
+        "required": ["name"]
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "address": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "version": { "type": "integer" },
+          "status": { "type": "string", "enum": ["active", "inactive"] }
+        },
+        "required": ["name"]
+      },
+      "ItemType": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "schema_definition": { "type": "object" },
+          "parent_id": { "type": "integer", "nullable": true },
+          "version": { "type": "integer" }
+        },
+        "required": ["name"]
+      }
+    }
+  },
+  "paths": {
+    "/categories": {
+      "get": {
+        "summary": "List categories",
+        "parameters": [
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Success", "content": { "application/json": { "schema": { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Category" } } } } } } }
+        }
+      },
+      "post": {
+        "summary": "Create category",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } }
+        },
+        "responses": {
+          "201": { "description": "Created" }
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "summary": "List locations",
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "summary": "Create location",
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/item-types": {
+      "get": {
+        "summary": "List item types",
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "summary": "Create item type",
+        "responses": { "201": { "description": "Created" } }
+      }
+    }
+  }
+}
